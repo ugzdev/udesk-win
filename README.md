@@ -124,6 +124,30 @@ pycryptodome
 
 ---
 
+## Third-Party Software & Licenses
+
+uDesk uses the following third-party software and resources:
+
+### Lucide Icons
+
+uDesk uses [Lucide](https://lucide.dev/) for its SVG icon gallery and icon resources.
+
+Lucide is licensed under the ISC License. Some Lucide icons are derived from Feather Icons and are distributed under the MIT License.
+
+- Lucide: https://github.com/lucide-icons/lucide
+- License: https://github.com/lucide-icons/lucide/blob/main/LICENSE
+
+### Android Debug Bridge (ADB)
+
+uDesk uses Android Debug Bridge (ADB) to communicate with Android devices (USB MODE).
+
+ADB is part of the Android SDK Platform-Tools provided by Google.
+
+- Android SDK Platform-Tools: https://developer.android.com/tools/releases/platform-tools
+- Android Developers: https://developer.android.com/
+
+Android SDK Platform-Tools and its components are subject to their respective licenses and terms.
+
 ## Setup & Connection
 
 1. **Run the Server:** Launch the `uDesk` executable (or `uDesk.pyw` from source) on your Windows machine. It opens the dashboard and also drops an icon in your system tray. Closing the window just minimizes it there, and the server keeps running until you quit it from the tray menu.
