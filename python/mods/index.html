@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="tr">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;800&display=swap" rel="stylesheet">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>uDesk</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background: #08080f;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            display: flex;
+            flex-direction: column
+        }
+
+        #page-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden
+        }
+
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: transform .45s cubic-bezier(.4, 0, .2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center
+        }
+
+        .page.hidden-left {
+            transform: translateX(-100%)
+        }
+
+        .page.hidden-right {
+            transform: translateX(100%)
+        }
+
+        /* PAGE 1 */
+        #page1 {
+            background: #08080f;
+            z-index: 2
+        }
+
+        .home-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            width: 100%;
+            padding: 0 16px
+        }
+
+        .clock-time {
+            font-family: 'Orbitron', monospace;
+            font-weight: 800;
+            font-size: clamp(3rem, 10vw, 5rem);
+            color: #fff;
+            letter-spacing: .03em;
+            line-height: 1;
+            white-space: nowrap
+        }
+
+        .clock-sec {
+            font-family: 'Orbitron', monospace;
+            font-weight: 400;
+            font-size: clamp(.8rem, 3vw, 1.3rem);
+            color: rgba(255, 255, 255, .3);
+            letter-spacing: .1em;
+            margin-top: 2px
+        }
+
+        .clock-date {
+            font-size: clamp(.6rem, 1.6vw, .8rem);
+            color: rgba(255, 255, 255, .35);
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            margin-top: 14px
+        }
+
+        .sep {
+            width: 1px;
+            height: 32px;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, .1), transparent);
+            margin: 20px 0
+        }
+
+        .udesk-name {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            font-size: clamp(1.2rem, 4vw, 2rem);
+            color: #fff;
+            letter-spacing: .2em;
+            position: relative
+        }
+
+        .udesk-name::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 28px;
+            height: 2px;
+            background: #662bc5;
+            border-radius: 2px
+        }
+
+        .udesk-sub {
+            font-size: clamp(.6rem, 1.6vw, .72rem);
+            color: rgba(255, 255, 255, .35);
+            margin-top: 14px;
+            letter-spacing: .45em
+        }
+
+        .pills {
+            display: flex;
+            gap: 10px;
+            margin-top: 22px;
+            flex-wrap: wrap;
+            justify-content: center
+        }
+
+        .pill {
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .07);
+            border-radius: 20px;
+            padding: 5px 14px;
+            font-size: clamp(.58rem, 1.5vw, .68rem);
+            color: rgba(255, 255, 255, .3);
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #00ffc8;
+            flex-shrink: 0
+        }
+
+        .dot.p {
+            background: #662bc5
+        }
+
+        /* PAGE 2 */
+        #page2 {
+            background: #08080f;
+            z-index: 1
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: min(600px, 95vw);
+            margin-bottom: 8px;
+            padding: 0 8px
+        }
+
+        .score-box {
+            color: #fff;
+            font-size: clamp(.9rem, 3vw, 1.3rem);
+            font-weight: 600
+        }
+
+        .score-box span {
+            color: #00ffc8
+        }
+
+        .game-lbl {
+            color: rgba(255, 255, 255, .18);
+            font-size: clamp(.6rem, 1.8vw, .78rem);
+            letter-spacing: .3em;
+            text-transform: uppercase
+        }
+
+        #game-canvas {
+            display: block;
+            max-width: 95vw;
+            max-height: 62vh;
+            cursor: none;
+            border: 1px solid rgba(255, 255, 255, .06)
+        }
+
+        .game-hint {
+            margin-top: 8px;
+            color: rgba(255, 255, 255, .15);
+            font-size: clamp(.58rem, 1.5vw, .7rem);
+            letter-spacing: .08em
+        }
+
+        /* OVERLAY */
+        #start-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(8, 8, 15, .93);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            color: #fff
+        }
+
+        #start-overlay h2 {
+            font-size: clamp(1.4rem, 5vw, 2.2rem);
+            margin-bottom: 8px;
+            font-weight: 800
+        }
+
+        #start-overlay p {
+            color: rgba(255, 255, 255, .35);
+            margin-bottom: 24px;
+            font-size: clamp(.72rem, 2vw, .9rem)
+        }
+
+        .start-btn-cls {
+            background: #fff;
+            border: none;
+            color: #08080f;
+            padding: 12px 40px;
+            border-radius: 3px;
+            font-size: clamp(.8rem, 2.2vw, .95rem);
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: .08em;
+            text-transform: uppercase
+        }
+
+        .hidden {
+            display: none !important
+        }
+
+        /* NAV */
+        #nav-bar {
+            display: flex;
+            background: #08080f;
+            border-top: 1px solid rgba(255, 255, 255, .06);
+            z-index: 10;
+            height: 40px;
+            flex-shrink: 0
+        }
+
+        .nav-btn {
+            flex: 1;
+            height: 100%;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, .28);
+            font-size: clamp(.78rem, 2.2vw, .9rem);
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: .1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            position: relative
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: transparent;
+            transition: background .3s
+        }
+
+        .nav-btn.active {
+            color: #fff
+        }
+
+        .nav-btn.active::before {
+            background: #662bc5
+        }
+
+        .nav-arr {
+            font-size: .68em
+        }
+
+        /* PAGE 3 – AA */
+        #page3 {
+            background: #f5f0e8;
+            z-index: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #aa-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            user-select: none;
+        }
+
+        #aa-canvas {
+            display: block;
+            touch-action: none;
+        }
+
+        #aa-ui {
+            position: absolute;
+            top: 12px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 18px;
+        }
+
+        #aa-level-lbl {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(.55rem, 1.8vw, .72rem);
+            color: rgba(0, 0, 0, .5);
+            letter-spacing: .25em;
+            text-transform: uppercase;
+        }
+
+        #aa-balls-lbl {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(.55rem, 1.8vw, .72rem);
+            color: rgba(0, 0, 0, .5);
+            letter-spacing: .15em;
+        }
+
+        #aa-score-lbl {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(.55rem, 1.8vw, .72rem);
+            color: rgba(0, 0, 0, .5);
+            letter-spacing: .15em;
+        }
+
+        #aa-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(245, 240, 232, .96);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+        }
+
+        #aa-overlay h2 {
+            font-family: 'Orbitron', monospace;
+            font-weight: 800;
+            font-size: clamp(1.6rem, 6vw, 2.6rem);
+            color: #111;
+            letter-spacing: .08em;
+            margin-bottom: 6px;
+        }
+
+        #aa-overlay .aa-sub {
+            font-size: clamp(.65rem, 2vw, .85rem);
+            color: rgba(0, 0, 0, .4);
+            letter-spacing: .18em;
+            margin-bottom: 28px;
+        }
+
+        .aa-btn {
+            background: #111;
+            border: none;
+            color: #f5f0e8;
+            padding: 12px 44px;
+            border-radius: 3px;
+            font-size: clamp(.78rem, 2.2vw, .93rem);
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+
+        #aa-hint {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: clamp(.55rem, 1.5vw, .68rem);
+            color: rgba(0, 0, 0, .6);
+            letter-spacing: .1em;
+        }
+    </style>
+    <base target="_blank">
+</head>
+
+<body>
+    <div id="page-container">
+
+        <!-- PAGE 1 -->
+        <div class="page" id="page1">
+            <div class="home-wrap">
+                <div class="clock-time" id="clk-hm">00:00</div>
+                <div class="clock-date" id="clk-d">—</div>
+                <div class="sep"></div>
+                <div class="udesk-name">uDesk</div>
+                <div class="udesk-sub">this is your space.</div>
+            </div>
+        </div>
+
+        <!-- PAGE 3 – AA -->
+        <div class="page hidden-right" id="page3">
+            <div id="aa-wrap">
+                <div id="aa-ui">
+                    <div id="aa-level-lbl">Level <span id="aa-lvl">1</span></div>
+                    <div id="aa-score-lbl">Puan: <span id="aa-pts">0</span></div>
+                    <div id="aa-balls-lbl">Top: <span id="aa-left">0</span></div>
+                </div>
+                <canvas id="aa-canvas"></canvas>
+                <div id="aa-hint">Ekrana dokun / tıkla → Top fırlat</div>
+                <div id="aa-overlay">
+                    <h2>AA</h2>
+                    <div class="aa-sub">Dönen çarka top at, çakıştırma!</div>
+                    <button class="aa-btn" id="aa-start-btn">BAŞLA</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 2 -->
+        <div class="page hidden-right" id="page2">
+            <div class="game-info">
+                <div class="score-box">Sen: <span id="pscore">0</span></div>
+                <div class="game-lbl">Ping Pong</div>
+                <div class="score-box">Bot: <span id="bscore">0</span></div>
+            </div>
+            <canvas id="game-canvas" width="600" height="400"></canvas>
+            <div class="game-hint">Fare / Dokunmatik ile sürükle</div>
+            <div id="start-overlay">
+                <h2>Ping Pong</h2>
+                <p>Bot'a karşı oyna — İlk 5 puan kazanır</p>
+                <button class="start-btn-cls" id="start-btn">BAŞLA</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="nav-bar">
+        <button class="nav-btn active" id="btn1" onclick="goTo(1)"><span class="nav-arr">◀</span> uDesk</button>
+        <button class="nav-btn" id="btn2" onclick="goTo(2)">Pong</button>
+        <button class="nav-btn" id="btn3" onclick="goTo(3)">AA <span class="nav-arr">▶</span></button>
+    </div>
+
+    <script>
+        // ── SAAT ────────────────────────────────────────────────────────
+        const D = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+        const M = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+        function p2(n) { return String(n).padStart(2, '0') }
+        function tickClock() {
+            const n = new Date();
+            document.getElementById('clk-hm').textContent = p2(n.getHours()) + ':' + p2(n.getMinutes());
+            document.getElementById('clk-d').textContent = D[n.getDay()] + ', ' + n.getDate() + ' ' + M[n.getMonth()] + ' ' + n.getFullYear();
+        }
+        tickClock();
+        setInterval(tickClock, 1000);
+
+        // ── SAYFA GEÇİŞ ─────────────────────────────────────────────────
+        let curPage = 1;
+        function goTo(n) {
+            if (n === curPage) return;
+            const pages = [document.getElementById('page1'), document.getElementById('page2'), document.getElementById('page3')];
+            const btns = [document.getElementById('btn1'), document.getElementById('btn2'), document.getElementById('btn3')];
+            const prev = curPage;
+            curPage = n;
+
+            pages.forEach((p, i) => {
+                p.classList.remove('hidden-left', 'hidden-right');
+                if (i + 1 < n) p.classList.add('hidden-left');
+                else if (i + 1 > n) p.classList.add('hidden-right');
+            });
+            btns.forEach((b, i) => b.classList.toggle('active', i + 1 === n));
+
+            if (prev === 2) gamePaused = true;
+            if (n === 3) aaResume(); else aaPause();
+        }
+
+        // ── PONG ─────────────────────────────────────────────────────────
+        // Maksimum sadelik: sıfır shadow, sıfır arc, sadece fillRect
+        const cv = document.getElementById('game-canvas');
+        const cx = cv.getContext('2d', { alpha: false, desynchronized: true });
+        const GW = 600, GH = 400, PW = 12, PH = 80, BR = 5;
+        const WIN = 5;
+
+        // Delta-time tabanlı hızlar (px/saniye)
+        const SPD0 = 220;   // başlangıç top hızı
+        const SPDMAX = 460; // max top hızı
+
+        // Bot: %60 başarı oranı — gerçekten kaçırır
+        // Botun tepki gecikmesi (ms): top yaklaşmadan önce bu kadar bekler
+        const BOT_PX_S = 160;        // bot hareket hızı px/s — düşük!
+        const BOT_MISS_CHANCE = 0.38; // her servis başında %38 ihtimalle o servisı kaybeder
+        const BOT_DEADZONE = 18;
+
+        let pY, bY, bX, bY2, bVX, bVY;
+        let pSc = 0, bSc = 0;
+        let running = false, gamePaused = false;
+        let raf = null, lt = 0;
+        let botWillMiss = false;   // bu servis için bot hata yapacak mı?
+        let botMissOff = 0;        // hata yapacaksa ne kadar sapacak
+
+        function resize() {
+            const mw = Math.min(window.innerWidth * .95, 600);
+            const mh = Math.min(window.innerHeight * .55, 400);
+            const sc = Math.min(mw / 600, mh / 400);
+            cv.style.width = (600 * sc) + 'px';
+            cv.style.height = (400 * sc) + 'px';
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        // Dokunmatik/fare
+        let drag = false, dragOff = 0;
+        function cY(e) {
+            const r = cv.getBoundingClientRect();
+            const cy = (e.touches && e.touches.length) ? e.touches[0].clientY : e.clientY;
+            return (cy - r.top) * (GH / r.height);
+        }
+        cv.addEventListener('mousedown', e => { if (!running || gamePaused) return; drag = true; dragOff = cY(e) - pY; });
+        cv.addEventListener('mousemove', e => { if (!drag || !running || gamePaused) return; e.preventDefault(); pY = Math.max(0, Math.min(GH - PH, cY(e) - dragOff)); });
+        window.addEventListener('mouseup', () => { drag = false; });
+        cv.addEventListener('touchstart', e => { if (!running || gamePaused) return; drag = true; dragOff = cY(e) - pY; }, { passive: true });
+        cv.addEventListener('touchmove', e => { if (!drag || !running || gamePaused) return; e.preventDefault(); pY = Math.max(0, Math.min(GH - PH, cY(e) - dragOff)); }, { passive: false });
+        window.addEventListener('touchend', () => { drag = false; });
+
+        document.getElementById('start-btn').addEventListener('click', startGame);
+
+        function resetBall() {
+            bX = GW / 2; bY2 = GH / 2;
+            // Her servis başında botun bu seferi kaçırıp kaçırmayacağını belirle
+            botWillMiss = (Math.random() < BOT_MISS_CHANCE);
+            botMissOff = botWillMiss ? ((Math.random() > 0.5 ? 1 : -1) * (PH * 0.6 + Math.random() * PH * 0.4)) : 0;
+            const ang = (Math.random() - .5) * .7;
+            const dir = (Math.random() > .5) ? 1 : -1;
+            bVX = Math.cos(ang) * SPD0 * dir;
+            bVY = Math.sin(ang) * SPD0;
+        }
+
+        function startGame() {
+            document.getElementById('start-overlay').classList.add('hidden');
+            pSc = 0; bSc = 0;
+            document.getElementById('pscore').textContent = '0';
+            document.getElementById('bscore').textContent = '0';
+            pY = GH / 2 - PH / 2; bY = GH / 2 - PH / 2;
+            resetBall();
+            running = true; gamePaused = false;
+            if (raf) cancelAnimationFrame(raf);
+            lt = performance.now();
+            raf = requestAnimationFrame(loop);
+        }
+
+        function endGame(w) {
+            running = false;
+            if (raf) cancelAnimationFrame(raf);
+            const ol = document.getElementById('start-overlay');
+            ol.innerHTML = '<h2>' + (w === 'p' ? 'KAZANDIN!' : 'BOT KAZANDI') + '</h2><p>Sen ' + pSc + ' — ' + bSc + ' Bot</p><button class="start-btn-cls" id="rb">TEKRAR OYNA</button>';
+            ol.classList.remove('hidden');
+            document.getElementById('rb').addEventListener('click', startGame);
+        }
+
+        function update(dt) {
+            if (!running || gamePaused) return;
+            const d = Math.min(dt, 50) / 1000;
+
+            // ── Bot hareketi ──
+            // Hedef: top bota geliyorsa paddle merkezini topa hizala, ama ağır ve hatalı
+            let targetMid;
+            if (bVX > 0) {
+                // Top bota geliyor — botun hedefi (hata payı ile)
+                targetMid = bY2 + botMissOff; // botWillMiss ise sapıyor
+            } else {
+                // Top uzaklaşıyor — ortalıyor
+                targetMid = GH / 2;
+            }
+            const botMid = bY + PH / 2;
+            const diff = targetMid - botMid;
+            if (Math.abs(diff) > BOT_DEADZONE) {
+                const mv = Math.sign(diff) * BOT_PX_S * d;
+                bY += Math.abs(mv) > Math.abs(diff) ? diff : mv;
+            }
+            bY = Math.max(0, Math.min(GH - PH, bY));
+
+            // ── Top ──
+            bX += bVX * d; bY2 += bVY * d;
+
+            // Duvar
+            if (bY2 - BR <= 0) { bVY = Math.abs(bVY); bY2 = BR; }
+            else if (bY2 + BR >= GH) { bVY = -Math.abs(bVY); bY2 = GH - BR; }
+
+            // Oyuncu paddle
+            if (bVX < 0 && bX - BR <= 22 && bX - BR >= 10 && bY2 + BR >= pY && bY2 - BR <= pY + PH) {
+                bX = 22 + BR;
+                const rel = (bY2 - pY) / PH - .5;
+                const spd = Math.min(Math.hypot(bVX, bVY) * 1.07, SPDMAX);
+                const a = rel * 1.1;
+                bVX = Math.abs(Math.cos(a) * spd);
+                bVY = Math.sin(a) * spd;
+            }
+
+            // Bot paddle
+            if (bVX > 0 && bX + BR >= GW - 22 && bX + BR <= GW - 10 && bY2 + BR >= bY && bY2 - BR <= bY + PH) {
+                bX = GW - 22 - BR;
+                const rel = (bY2 - bY) / PH - .5;
+                const spd = Math.min(Math.hypot(bVX, bVY) * 1.07, SPDMAX);
+                const a = rel * 1.1;
+                bVX = -Math.abs(Math.cos(a) * spd);
+                bVY = Math.sin(a) * spd;
+            }
+
+            // Gol
+            if (bX < -BR) {
+                bSc++; document.getElementById('bscore').textContent = bSc;
+                if (bSc >= WIN) { endGame('b'); return; }
+                resetBall();
+            }
+            if (bX > GW + BR) {
+                pSc++; document.getElementById('pscore').textContent = pSc;
+                if (pSc >= WIN) { endGame('p'); return; }
+                resetBall();
+            }
+        }
+
+        function draw() {
+            // Arka plan - tek fillRect, sıfır efekt
+            cx.fillStyle = '#08080f';
+            cx.fillRect(0, 0, GW, GH);
+
+            // Orta çizgi — basit tek renk
+            cx.fillStyle = 'rgba(255,255,255,0.05)';
+            for (let y = 0; y < GH; y += 20)cx.fillRect(GW / 2 - .5, y, 1, 10);
+
+            // Oyuncu paddle
+            cx.fillStyle = '#fff';
+            cx.fillRect(10, pY, PW, PH);
+
+            // Bot paddle
+            cx.fillStyle = 'rgba(255,255,255,.4)';
+            cx.fillRect(GW - 10 - PW, bY, PW, PH);
+
+            // Top — sadece kare, sıfır arc
+            cx.fillStyle = '#00ffc8';
+            cx.fillRect(bX - BR, bY2 - BR, BR * 2, BR * 2);
+        }
+
+        function loop(ts) {
+            if (!running) return;
+            const dt = ts - lt; lt = ts;
+            update(dt);
+            draw();
+            raf = requestAnimationFrame(loop);
+        }
+
+        // ilk çizim
+        draw();
+
+        // ── SWIPE ─────────────────────────────────────────────────────────
+        let tx = 0;
+        document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+        document.addEventListener('touchend', e => {
+            const d = tx - e.changedTouches[0].clientX;
+            if (Math.abs(d) > 60) {
+                if (d > 0 && curPage < 3) goTo(curPage + 1);
+                else if (d < 0 && curPage > 1) goTo(curPage - 1);
+            }
+        }, { passive: true });
+
+        // ── AA OYUNU ─────────────────────────────────────────────────────
+        (function () {
+            const canvas = document.getElementById('aa-canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Renkler (bej tema)
+            const BG = '#f5f0e8';
+            const DARK = '#111111';
+            const ACCENT = '#111111';
+            const BALL_CLR = '#111111';
+            const STUCK_CLR = '#111111';
+            const HUB_CLR = '#111111';
+
+            // Seviye tanımları: [top sayısı, dönüş hızı (rad/s), ilave çubuk?]
+            const LEVELS = [
+                { balls: 5, rpm: 40 },
+                { balls: 7, rpm: 50 },
+                { balls: 9, rpm: 62 },
+                { balls: 11, rpm: 75 },
+                { balls: 13, rpm: 90 },
+                { balls: 15, rpm: 108 },
+                { balls: 17, rpm: 128 },
+                { balls: 20, rpm: 150 },
+            ];
+
+            let W, H, CX, CY, RADIUS, BALL_R, HUB_R;
+            let level = 0, score = 0;
+            let angle = 0;          // çark açısı (radyan)
+            let stuckBalls = [];    // çubuğa yapışmış toplar [{angle, dist}]
+            let flyBalls = [];      // havadaki toplar [{x,y,vy}]
+            let ballsLeft = 0;
+            let shootCooldown = 0;
+            let aaRunning = false;
+            let aaRaf = null, aaLt = 0;
+            let aaSpeed = 0;        // mevcut açısal hız (rad/s, ±)
+            let collided = false;   // çakışma oldu mu
+
+            function resize() {
+                const size = Math.min(window.innerWidth, window.innerHeight * 0.88, 420);
+                W = size; H = size;
+                canvas.width = W; canvas.height = H;
+                CX = W / 2; CY = H / 2;
+                RADIUS = W * 0.36;
+                BALL_R = W * 0.038;
+                HUB_R = W * 0.11;
+            }
+
+            function initLevel() {
+                const lv = LEVELS[Math.min(level, LEVELS.length - 1)];
+                ballsLeft = lv.balls;
+                aaSpeed = (lv.rpm * Math.PI / 180) * (Math.random() > 0.5 ? 1 : -1);
+                stuckBalls = [];
+                flyBalls = [];
+                collided = false;
+                angle = 0;
+                document.getElementById('aa-lvl').textContent = level + 1;
+                document.getElementById('aa-left').textContent = ballsLeft;
+                document.getElementById('aa-pts').textContent = score;
+            }
+
+            function startAA() {
+                document.getElementById('aa-overlay').style.display = 'none';
+                level = 0; score = 0;
+                initLevel();
+                aaRunning = true;
+                if (aaRaf) cancelAnimationFrame(aaRaf);
+                aaLt = performance.now();
+                aaRaf = requestAnimationFrame(aaLoop);
+            }
+
+            function aaPause() {
+                aaRunning = false;
+                if (aaRaf) { cancelAnimationFrame(aaRaf); aaRaf = null; }
+            }
+
+            function aaResume() {
+                if (!aaRunning && document.getElementById('aa-overlay').style.display === 'none') {
+                    aaRunning = true;
+                    aaLt = performance.now();
+                    aaRaf = requestAnimationFrame(aaLoop);
+                }
+            }
+
+            function shoot() {
+                if (!aaRunning || collided || ballsLeft <= 0 || shootCooldown > 0) return;
+                flyBalls.push({ x: CX, y: H - BALL_R * 2, vy: -W * 1.1 });
+                ballsLeft--;
+                document.getElementById('aa-left').textContent = ballsLeft;
+                shootCooldown = 220; // ms
+            }
+
+            canvas.addEventListener('click', shoot);
+            canvas.addEventListener('touchstart', e => { e.preventDefault(); shoot(); }, { passive: false });
+            document.getElementById('aa-start-btn').addEventListener('click', startAA);
+
+            function showOverlay(title, sub, btnTxt) {
+                const ol = document.getElementById('aa-overlay');
+                ol.style.display = 'flex';
+                ol.innerHTML = '<h2>' + title + '</h2><div class="aa-sub">' + sub + '</div><button class="aa-btn" id="aa-start-btn">' + btnTxt + '</button>';
+                document.getElementById('aa-start-btn').addEventListener('click', startAA);
+            }
+
+            function aaLoop(ts) {
+                if (!aaRunning) return;
+                const dt = Math.min(ts - aaLt, 50) / 800;
+                aaLt = ts;
+                shootCooldown = Math.max(0, shootCooldown - dt * 7000);
+
+                // Çark dönüşü — her topun sıkışma pozisyonu güncellenir
+                angle += aaSpeed * dt;
+
+                // Uçan toplar
+                for (let i = flyBalls.length - 1; i >= 0; i--) {
+                    const b = flyBalls[i];
+                    b.y += b.vy * dt;
+
+                    // Hub çarpışması (merkez daire)
+                    const dx = b.x - CX, dy = b.y - CY;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist < HUB_R + BALL_R) {
+                        // Çubuğun üstüne yapış — hub kenarına
+                        const snapAngle = angle; // referans çark açısı
+                        const relAngle = Math.atan2(dy, dx) - angle;
+                        stuckBalls.push({ relAngle, dist: HUB_R + BALL_R });
+                        flyBalls.splice(i, 1);
+                        score++;
+                        document.getElementById('aa-pts').textContent = score;
+                        checkCollision();
+                        continue;
+                    }
+
+                    // Çubuğa (RADIUS mesafesine) yaklaşma — dairenin çevresine yapış
+                    if (dist >= RADIUS - BALL_R * 1.2 && dist <= RADIUS + BALL_R * 0.5) {
+                        const relAngle = Math.atan2(dy, dx) - angle;
+                        stuckBalls.push({ relAngle, dist: RADIUS });
+                        flyBalls.splice(i, 1);
+                        score++;
+                        document.getElementById('aa-pts').textContent = score;
+                        checkCollision();
+                        continue;
+                    }
+
+                    // Ekran dışı
+                    if (b.y < -BALL_R * 2) {
+                        flyBalls.splice(i, 1);
+                    }
+                }
+
+                // Tüm toplar atıldı mı? (ve hava boş)
+                if (ballsLeft === 0 && flyBalls.length === 0 && !collided) {
+                    // Seviye tamamlandı
+                    aaRunning = false;
+                    setTimeout(() => {
+                        level++;
+                        if (level >= LEVELS.length) {
+                            showOverlay('TAMAMLANDI!', 'Puan: ' + score, 'TEKRAR');
+                        } else {
+                            initLevel();
+                            aaRunning = true;
+                            aaLt = performance.now();
+                            aaRaf = requestAnimationFrame(aaLoop);
+                            return;
+                        }
+                    }, 400);
+                    draw();
+                    return;
+                }
+
+                draw();
+                aaRaf = requestAnimationFrame(aaLoop);
+            }
+
+            function checkCollision() {
+                // Yapışık toplar birbirine çok yakın mı?
+                for (let i = 0; i < stuckBalls.length; i++) {
+                    for (let j = i + 1; j < stuckBalls.length; j++) {
+                        const ai = stuckBalls[i].relAngle + angle;
+                        const aj = stuckBalls[j].relAngle + angle;
+                        const xi = CX + Math.cos(ai) * stuckBalls[i].dist;
+                        const yi = CY + Math.sin(ai) * stuckBalls[i].dist;
+                        const xj = CX + Math.cos(aj) * stuckBalls[j].dist;
+                        const yj = CY + Math.sin(aj) * stuckBalls[j].dist;
+                        if (Math.hypot(xi - xj, yi - yj) < BALL_R * 1.85) {
+                            triggerCollision();
+                            return;
+                        }
+                    }
+                }
+            }
+
+            function triggerCollision() {
+                collided = true;
+                aaRunning = false;
+                if (aaRaf) { cancelAnimationFrame(aaRaf); aaRaf = null; }
+                // Flash
+                canvas.style.outline = '3px solid #d00';
+                setTimeout(() => { canvas.style.outline = ''; }, 300);
+                setTimeout(() => {
+                    score = Math.max(0, score - stuckBalls.length);
+                    showOverlay('KAYBETTIN!', 'Puan: ' + score + ' — Level ' + (level + 1), 'TEKRAR');
+                }, 500);
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, W, H);
+                ctx.fillStyle = BG;
+                ctx.fillRect(0, 0, W, H);
+
+                // Çark çemberi (ince daire)
+                ctx.beginPath();
+                ctx.arc(CX, CY, RADIUS, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // Yapışık toplar
+                for (const b of stuckBalls) {
+                    const a = b.relAngle + angle;
+                    const x = CX + Math.cos(a) * b.dist;
+                    const y = CY + Math.sin(a) * b.dist;
+                    ctx.beginPath();
+                    ctx.arc(x, y, BALL_R, 0, Math.PI * 2);
+                    ctx.fillStyle = STUCK_CLR;
+                    ctx.fill();
+                    // İnce çizgi hub'a
+                    ctx.beginPath();
+                    ctx.moveTo(CX, CY);
+                    ctx.lineTo(x, y);
+                    ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+
+                // Hub dairesi
+                ctx.beginPath();
+                ctx.arc(CX, CY, HUB_R, 0, Math.PI * 2);
+                ctx.fillStyle = HUB_CLR;
+                ctx.fill();
+
+                // Level yazısı hub içinde
+                ctx.fillStyle = BG;
+                ctx.font = `800 ${HUB_R * 0.55}px 'Orbitron', monospace`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(level + 1, CX, CY - HUB_R * 0.1);
+                ctx.font = `400 ${HUB_R * 0.25}px 'Orbitron', monospace`;
+                ctx.fillStyle = 'rgba(245,240,232,0.5)';
+                ctx.fillText('LEVEL', CX, CY + HUB_R * 0.32);
+
+                // Uçan toplar
+                for (const b of flyBalls) {
+                    ctx.beginPath();
+                    ctx.arc(b.x, b.y, BALL_R, 0, Math.PI * 2);
+                    ctx.fillStyle = BALL_CLR;
+                    ctx.fill();
+                }
+
+                // Atış noktası (altta)
+                ctx.beginPath();
+                ctx.arc(CX, H - BALL_R * 2, BALL_R * 0.6, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0,0,0,0.18)';
+                ctx.fill();
+            }
+
+            // İlk çizim
+            resize();
+            draw();
+            window.addEventListener('resize', () => { resize(); draw(); });
+        })();
+    </script>
+</body>
+
+</html>
