@@ -893,7 +893,6 @@ class ServerThread(QThread):
                     global last_net_bytes, last_net_time, SHARED_URL, PENDING_SCREENSHOT, SHARED_MINI_URL
                     global REFRESH_APPS_REQUESTED, REFRESH_MODS_REQUESTED
                     
-                    # İlk bağlantıda verileri bir kereye mahsus mutlaka gönder
                     first_sync = True 
                     
                     try:
@@ -904,7 +903,7 @@ class ServerThread(QThread):
                                 break
 
                             if POWER_SAVING_ACTIVE:
-                                # ... [Power saving kodu aynen kalıyor] ...
+                                time.sleep(1.0)
                                 continue
 
                             # ── NORMAL MOD ──────────────────
@@ -1309,7 +1308,7 @@ class UDeskUI(QMainWindow):
         
         icon_path = os.path.join(BASE_DIR, "icons", "app_icon_000.png")
         self.setWindowIcon(QIcon(icon_path))
-        self.setFixedSize(660, 750)
+        self.setFixedSize(660, 800)
         self._gif_movie = None
         self._net_manager = QNetworkAccessManager(self)
         self._net_manager.finished.connect(self._on_url_image_loaded)
@@ -1580,6 +1579,12 @@ class UDeskUI(QMainWindow):
         add_btn.setFixedHeight(40)
         add_btn.clicked.connect(self.open_add_app_dialog)
         cl.addWidget(add_btn)
+        
+        security_note = QLabel("For your safety, only use uDesk on trusted, private networks (e.g. your home Wi-Fi).")
+        security_note.setObjectName("SecurityNote")
+        security_note.setAlignment(Qt.AlignCenter)
+        security_note.setWordWrap(True)
+        cl.addWidget(security_note)
 
         root_layout.addWidget(content, stretch=1)
         
@@ -1952,6 +1957,7 @@ class UDeskUI(QMainWindow):
             }
 
             #SectionLabel { color: #5e5e5e; font-size: 11px; font-weight: bold; }
+            #SecurityNote { color: #bf0000; font-size: 11px; font-weight: normal; padding-top: 2px; }
             #Sep { color: #1e1e1e; }
 
             QScrollArea, #AppScroll { background: transparent; border: none; }
