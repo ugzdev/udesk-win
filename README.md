@@ -128,6 +128,20 @@ pycryptodome
 
 uDesk uses the following third-party software and resources:
 
+### Android Debug Bridge (ADB) for USB Cable Mode (Zero-Latency)
+
+uDesk uses Android Debug Bridge (ADB) to communicate with Android devices (USB Cable Mode). ADB is part of the Android SDK Platform-Tools provided by Google. Due to licensing restrictions, these binaries are not bundled with the uDesk PC application. 
+
+If you want to use the ultra-low latency USB connection, you need to add these files manually to the application's working directory:
+
+1. **Download Platform-Tools:** Visit the official [Android SDK Platform-Tools page](https://developer.android.com/tools/releases/platform-tools) and download the ZIP package for Windows.
+2. **Extract Required Files:** Open the downloaded ZIP file and extract **only** the following three files:
+   * `adb.exe`
+   * `AdbWinApi.dll`
+   * `AdbWinUsbApi.dll`
+3. **Place in Working Directory:** Copy these three files and paste them directly into the folder where your `uDesk.exe` (or `uDesk.pyw` if running from source) is located. 
+4. **Connect & Restart:** Connect your Android device to your PC via USB (ensure USB Debugging is enabled on your phone), and restart the uDesk PC server. uDesk will automatically detect the ADB files and establish the wired bridge.
+
 ### Lucide Icons
 
 uDesk uses [Lucide](https://lucide.dev/) for its SVG icon gallery and icon resources.
@@ -136,17 +150,6 @@ Lucide is licensed under the ISC License. Some Lucide icons are derived from Fea
 
 - Lucide: https://github.com/lucide-icons/lucide
 - License: https://github.com/lucide-icons/lucide/blob/main/LICENSE
-
-### Android Debug Bridge (ADB)
-
-uDesk uses Android Debug Bridge (ADB) to communicate with Android devices (USB MODE).
-
-ADB is part of the Android SDK Platform-Tools provided by Google.
-
-- Android SDK Platform-Tools: https://developer.android.com/tools/releases/platform-tools
-- Android Developers: https://developer.android.com/
-
-Android SDK Platform-Tools and its components are subject to their respective licenses and terms.
 
 ## Setup & Connection
 
