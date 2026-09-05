@@ -1,549 +1,1154 @@
 <!DOCTYPE html>
-<html lang="tr">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;800&display=swap" rel="stylesheet">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>uDesk</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>uDesk MiniWeb</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Oxanium:wght@400;600;700&display=swap"
+        rel="stylesheet">
     <style>
+        :root {
+            --bg: #0b0a08;
+            --panel: #141210;
+            --panel-2: #1b1713;
+            --line: rgba(243, 234, 216, .10);
+            --line-strong: rgba(243, 234, 216, .20);
+            --cream: #f3ead8;
+            --cream-dim: rgba(243, 234, 216, .58);
+            --cream-faint: rgba(243, 234, 216, .32);
+            --gold: #d8bd8e;
+            --gold-soft: rgba(216, 189, 142, .14);
+            --blue: #ddaa7a;
+        }
+
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         html,
         body {
-            height: 100vh;
-            width: 100vw;
+            height: 100%;
+            width: 100%;
             overflow: hidden;
-            background: #08080f;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            display: flex;
-            flex-direction: column
-        }
-
-        #page-container {
-            flex: 1;
-            position: relative;
-            overflow: hidden
+            background:
+                radial-gradient(circle at 18% 12%, rgba(216, 189, 142, .07), transparent 40%),
+                radial-gradient(circle at 85% 90%, rgba(216, 189, 142, .05), transparent 45%),
+                var(--bg);
+            color: var(--cream);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         .page {
-            position: absolute;
-            top: 0;
-            left: 0;
+            height: 100dvh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .focus-wrap {
+            flex: 1;
             width: 100%;
             height: 100%;
-            transition: transform .45s cubic-bezier(.4, 0, .2, 1);
+            position: relative;
+        }
+
+        .pages-track {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center
-        }
-
-        .page.hidden-left {
-            transform: translateX(-100%)
-        }
-
-        .page.hidden-right {
-            transform: translateX(100%)
-        }
-
-        /* PAGE 1 */
-        #page1 {
-            background: #08080f;
-            z-index: 2
-        }
-
-        .home-wrap {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0;
+            height: 100%;
             width: 100%;
-            padding: 0 16px
+            transition: transform .6s cubic-bezier(.16, 1, .3, 1);
         }
 
-        .clock-time {
-            font-family: 'Orbitron', monospace;
-            font-weight: 800;
-            font-size: clamp(3rem, 10vw, 5rem);
-            color: #fff;
-            letter-spacing: .03em;
-            line-height: 1;
-            white-space: nowrap
+        .page-slide {
+            flex: 0 0 100%;
+            height: 100%;
+            padding: 40px 60px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
-        .clock-sec {
-            font-family: 'Orbitron', monospace;
-            font-weight: 400;
-            font-size: clamp(.8rem, 3vw, 1.3rem);
-            color: rgba(255, 255, 255, .3);
-            letter-spacing: .1em;
-            margin-top: 2px
+        .welcome-slide {
+            padding: 0;
+            scroll-behavior: smooth;
         }
 
-        .clock-date {
-            font-size: clamp(.6rem, 1.6vw, .8rem);
-            color: rgba(255, 255, 255, .35);
-            letter-spacing: .2em;
+        .hero-section {
+            position: relative;
+            width: 100%;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .vector-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 1;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .vector-art {
+            width: 100%;
+            height: 100%;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            animation: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        .hero-kicker {
+            letter-spacing: 0.3em;
+            font-size: 0.7rem;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, var(--cream) 20%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+            margin-top: 10px;
+        }
+
+        .scroll-prompt {
+            position: absolute;
+            bottom: 15px;
+            /* Daha aşağıya çektik */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            /* İkon ve yazı arası boşluğu kısalttık */
+            color: var(--cream-dim);
+            font-size: 0.55rem;
+            /* Yazıyı daha da küçülttük */
             text-transform: uppercase;
-            margin-top: 14px
+            letter-spacing: 0.2em;
+            z-index: 2;
+            animation: bounce 2.5s infinite ease-in-out;
+            cursor: pointer;
         }
 
-        .sep {
+        .spin-slow {
+            animation-name: spin-slow;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+
+        .spin-reverse {
+            animation-name: spin-reverse;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+
+        .scroll-prompt svg {
+            width: 14px;
+            /* Ok ikonunu küçülttük */
+            height: 14px;
+            color: var(--gold);
+        }
+
+        .welcome-details {
+            padding: 80px 40px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom, transparent, rgba(20, 18, 16, 0.9));
+        }
+
+        .welcome-details .slide-text {
+            max-width: 700px;
+            font-size: 0.9rem;
+        }
+
+        .slide-kicker {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 0.6rem;
+            letter-spacing: .15em;
+            color: var(--gold);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .slide-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            letter-spacing: -0.01em;
+        }
+
+        .slide-text {
+            font-size: 0.8rem;
+            line-height: 1.5;
+            color: var(--cream-dim);
+            margin-bottom: 10px;
+            max-width: 800px;
+        }
+
+        .highlight-box {
+            background: rgba(216, 189, 142, 0.05);
+            border: 1px solid var(--gold-soft);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-family: ui-monospace, monospace;
+            font-size: 0.8rem;
+            color: var(--gold);
+            margin: 15px 0;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .highlight-box:hover {
+            transform: translateY(-2px);
+            border-color: var(--gold);
+        }
+
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            gap: 15px;
+        }
+
+        .digital-clock {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .analog-clock {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid var(--panel-2);
+            background: rgba(0, 0, 0, 0.2);
+            position: relative;
+            display: none;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .analog-clock.light {
+            background: #f3ead8;
+            border-color: rgba(11, 10, 8, 0.3);
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .analog-clock.light .hour-hand {
+            background: #0b0a08;
+        }
+
+        .analog-clock.light .min-hand {
+            background: rgba(11, 10, 8, 0.6);
+        }
+
+        .analog-clock.light .analog-center {
+            background: #8fb0d6;
+        }
+
+        .analog-center {
+            width: 8px;
+            height: 8px;
+            background: var(--gold);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            border-radius: 2px;
+        }
+
+        .hour-hand {
+            width: 3px;
+            height: 35px;
+            background: var(--cream);
+            margin-left: -1.5px;
+            z-index: 3;
+        }
+
+        .min-hand {
+            width: 2px;
+            height: 50px;
+            background: var(--cream-dim);
+            margin-left: -1px;
+            z-index: 2;
+        }
+
+        .sec-hand {
             width: 1px;
-            height: 32px;
-            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, .1), transparent);
-            margin: 20px 0
+            height: 55px;
+            background: var(--blue);
+            margin-left: -0.5px;
+            z-index: 4;
         }
 
-        .udesk-name {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 800;
-            font-size: clamp(1.2rem, 4vw, 2rem);
-            color: #fff;
-            letter-spacing: .2em;
-            position: relative
+        .controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: auto;
+            padding-bottom: 20px;
         }
 
-        .udesk-name::after {
+        button.btn {
+            background: var(--panel-2);
+            color: var(--cream);
+            border: 1px solid var(--line-strong);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button.btn:hover,
+        button.btn.active {
+            background: var(--gold);
+            color: #000;
+            border-color: var(--gold);
+        }
+
+        .todo-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .todo-input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .todo-input-group input {
+            flex: 1;
+            background: var(--panel-2);
+            border: 1px solid var(--line-strong);
+            border-radius: 6px;
+            padding: 10px;
+            color: var(--cream);
+            font-size: 0.8rem;
+            outline: none;
+        }
+
+        .todo-input-group input:focus {
+            border-color: var(--gold);
+        }
+
+        .todo-input-group button {
+            background: var(--gold);
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            padding: 0 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .todo-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 4px;
+            padding-bottom: 20px;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(27, 23, 19, 0.4);
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .todo-item:hover {
+            background: rgba(27, 23, 19, 0.8);
+        }
+
+        .todo-item input[type="checkbox"] {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border: 1px solid var(--line-strong);
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .todo-item input[type="checkbox"]:checked {
+            background: var(--gold);
+            border-color: var(--gold);
+        }
+
+        .todo-item input[type="checkbox"]:checked::after {
             content: '';
             position: absolute;
-            bottom: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 28px;
-            height: 2px;
-            background: #662bc5;
-            border-radius: 2px
+            left: 4px;
+            top: 2px;
+            width: 3px;
+            height: 6px;
+            border: solid #000;
+            border-width: 0 1.5px 1.5px 0;
+            transform: rotate(45deg);
         }
 
-        .udesk-sub {
-            font-size: clamp(.6rem, 1.6vw, .72rem);
-            color: rgba(255, 255, 255, .35);
-            margin-top: 14px;
-            letter-spacing: .45em
+        .todo-item span {
+            font-size: 0.8rem;
+            transition: all 0.2s;
         }
 
-        .pills {
+        .todo-item input[type="checkbox"]:checked+span {
+            color: var(--cream-faint);
+            text-decoration: line-through;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            overflow-y: auto;
+            max-width: 1000px;
+            padding-bottom: 20px;
+        }
+
+        .news-card {
+            background: rgba(27, 23, 19, 0.4);
+            border: 1px solid var(--line-strong);
+            border-radius: 8px;
+            padding: 12px;
             display: flex;
-            gap: 10px;
-            margin-top: 22px;
-            flex-wrap: wrap;
-            justify-content: center
+            flex-direction: column;
+            gap: 6px;
+            transition: transform 0.2s;
         }
 
-        .pill {
-            background: rgba(255, 255, 255, .04);
-            border: 1px solid rgba(255, 255, 255, .07);
-            border-radius: 20px;
-            padding: 5px 14px;
-            font-size: clamp(.58rem, 1.5vw, .68rem);
-            color: rgba(255, 255, 255, .3);
+        .news-card:hover {
+            transform: translateY(-2px);
+            background: rgba(27, 23, 19, 0.8);
+        }
+
+        .news-category {
+            font-size: 0.6rem;
+            color: var(--blue);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .news-headline {
+            font-size: 0.85rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .news-meta {
+            font-size: 0.65rem;
+            color: var(--cream-dim);
+            margin-top: auto;
+            padding-top: 6px;
+        }
+
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(20, 18, 16, 0.6);
+            border: 1px solid var(--line-strong);
+            color: var(--cream);
             display: flex;
             align-items: center;
-            gap: 6px
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            z-index: 100;
+            transition: all 0.2s;
         }
 
-        .dot {
-            width: 5px;
-            height: 5px;
+        .nav-arrow:hover:not([disabled]) {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .nav-arrow.left {
+            left: 8px;
+        }
+
+        .nav-arrow.right {
+            right: 8px;
+        }
+
+        .nav-arrow[disabled] {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .focus-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            z-index: 100;
+        }
+
+        .focus-dots button {
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
-            background: #00ffc8;
-            flex-shrink: 0
+            background: var(--line-strong);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 0;
         }
 
-        .dot.p {
-            background: #662bc5
+        .focus-dots button.on {
+            background: var(--gold);
+            transform: scale(1.3);
         }
 
-        /* PAGE 2 */
-        #page2 {
-            background: #08080f;
-            z-index: 1
+        .font-default {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .font-oxanium {
+            font-family: 'Oxanium', sans-serif;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--line-strong);
+            border-radius: 2px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--cream-dim);
+        }
+
+        @media(max-width: 600px) {
+            .page-slide {
+                padding: 30px 40px;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* transform-origin'leri keyframe içinden çıkardık */
+        @keyframes spin-slow {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin-reverse {
+            from {
+                transform: rotate(360deg);
+            }
+
+            to {
+                transform: rotate(0deg);
+            }
+        }
+
+        /* Tüm dönen SVG elementleri için yörünge merkezini SVG'nin tam ortası yapıyoruz */
+        .spin-slow,
+        .spin-reverse {
+            transform-origin: 200px 200px;
+            transform-box: view-box;
+            /* Olayı çözen sihirli kod bu, merkezi genel SVG'ye sabitler */
+        }
+
+        @keyframes pulse-orb {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.3;
+                filter: drop-shadow(0 0 5px var(--gold));
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 0.8;
+                filter: drop-shadow(0 0 15px var(--gold));
+            }
+        }
+
+        /* Gezegenlerin parlarken yörüngeden kaymaması için */
+        .orb-1 {
+            transform-origin: 360px 200px;
+            transform-box: view-box;
+            animation: pulse-orb 4s infinite ease-in-out;
+        }
+
+        .orb-2 {
+            transform-origin: 200px 320px;
+            transform-box: view-box;
+            animation: pulse-orb 5s infinite ease-in-out 1s;
+        }
+
+        .orb-3 {
+            transform-origin: 120px 200px;
+            transform-box: view-box;
+            animation: pulse-orb 6s infinite ease-in-out 2s;
+        }
+
+        .game-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         .game-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            width: min(600px, 95vw);
-            margin-bottom: 8px;
-            padding: 0 8px
+            width: 100%;
+            margin-bottom: 12px;
+            padding: 0 10px;
         }
 
         .score-box {
-            color: #fff;
-            font-size: clamp(.9rem, 3vw, 1.3rem);
-            font-weight: 600
+            font-size: 1.1rem;
+            font-weight: 600;
         }
 
         .score-box span {
-            color: #00ffc8
+            color: var(--gold);
         }
 
         .game-lbl {
-            color: rgba(255, 255, 255, .18);
-            font-size: clamp(.6rem, 1.8vw, .78rem);
-            letter-spacing: .3em;
-            text-transform: uppercase
+            color: var(--cream-dim);
+            font-size: 0.75rem;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 3/2;
+            border: 1px solid var(--line-strong);
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--bg);
         }
 
         #game-canvas {
-            display: block;
-            max-width: 95vw;
-            max-height: 62vh;
-            cursor: none;
-            border: 1px solid rgba(255, 255, 255, .06)
-        }
-
-        .game-hint {
-            margin-top: 8px;
-            color: rgba(255, 255, 255, .15);
-            font-size: clamp(.58rem, 1.5vw, .7rem);
-            letter-spacing: .08em
-        }
-
-        /* OVERLAY */
-        #start-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(8, 8, 15, .93);
+            display: block;
+            touch-action: none;
+            cursor: none;
+        }
+
+        #start-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(11, 10, 8, 0.92);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 10;
-            color: #fff
         }
 
-        #start-overlay h2 {
-            font-size: clamp(1.4rem, 5vw, 2.2rem);
-            margin-bottom: 8px;
-            font-weight: 800
+        #start-overlay h3 {
+            font-size: 1.6rem;
+            margin-bottom: 5px;
+            color: var(--cream);
         }
 
         #start-overlay p {
-            color: rgba(255, 255, 255, .35);
-            margin-bottom: 24px;
-            font-size: clamp(.72rem, 2vw, .9rem)
+            color: var(--cream-dim);
+            margin-bottom: 20px;
+            font-size: 0.85rem;
         }
 
-        .start-btn-cls {
-            background: #fff;
-            border: none;
-            color: #08080f;
-            padding: 12px 40px;
-            border-radius: 3px;
-            font-size: clamp(.8rem, 2.2vw, .95rem);
-            font-weight: 700;
-            cursor: pointer;
-            letter-spacing: .08em;
-            text-transform: uppercase
-        }
-
-        .hidden {
-            display: none !important
-        }
-
-        /* NAV */
-        #nav-bar {
-            display: flex;
-            background: #08080f;
-            border-top: 1px solid rgba(255, 255, 255, .06);
-            z-index: 10;
-            height: 40px;
-            flex-shrink: 0
-        }
-
-        .nav-btn {
-            flex: 1;
-            height: 100%;
-            background: transparent;
-            border: none;
-            color: rgba(255, 255, 255, .28);
-            font-size: clamp(.78rem, 2.2vw, .9rem);
-            font-weight: 600;
-            cursor: pointer;
-            letter-spacing: .1em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-            position: relative
-        }
-
-        .nav-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: transparent;
-            transition: background .3s
-        }
-
-        .nav-btn.active {
-            color: #fff
-        }
-
-        .nav-btn.active::before {
-            background: #662bc5
-        }
-
-        .nav-arr {
-            font-size: .68em
-        }
-
-        /* PAGE 3 – AA */
-        #page3 {
-            background: #f5f0e8;
-            z-index: 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        #aa-wrap {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            position: relative;
-            user-select: none;
-        }
-
-        #aa-canvas {
-            display: block;
-            touch-action: none;
-        }
-
-        #aa-ui {
-            position: absolute;
-            top: 12px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 18px;
-        }
-
-        #aa-level-lbl {
-            font-family: 'Orbitron', monospace;
-            font-size: clamp(.55rem, 1.8vw, .72rem);
-            color: rgba(0, 0, 0, .5);
-            letter-spacing: .25em;
-            text-transform: uppercase;
-        }
-
-        #aa-balls-lbl {
-            font-family: 'Orbitron', monospace;
-            font-size: clamp(.55rem, 1.8vw, .72rem);
-            color: rgba(0, 0, 0, .5);
-            letter-spacing: .15em;
-        }
-
-        #aa-score-lbl {
-            font-family: 'Orbitron', monospace;
-            font-size: clamp(.55rem, 1.8vw, .72rem);
-            color: rgba(0, 0, 0, .5);
-            letter-spacing: .15em;
-        }
-
-        #aa-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(245, 240, 232, .96);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 20;
-        }
-
-        #aa-overlay h2 {
-            font-family: 'Orbitron', monospace;
-            font-weight: 800;
-            font-size: clamp(1.6rem, 6vw, 2.6rem);
-            color: #111;
-            letter-spacing: .08em;
-            margin-bottom: 6px;
-        }
-
-        #aa-overlay .aa-sub {
-            font-size: clamp(.65rem, 2vw, .85rem);
-            color: rgba(0, 0, 0, .4);
-            letter-spacing: .18em;
-            margin-bottom: 28px;
-        }
-
-        .aa-btn {
-            background: #111;
-            border: none;
-            color: #f5f0e8;
-            padding: 12px 44px;
-            border-radius: 3px;
-            font-size: clamp(.78rem, 2.2vw, .93rem);
-            font-weight: 700;
-            cursor: pointer;
-            letter-spacing: .12em;
-            text-transform: uppercase;
-        }
-
-        #aa-hint {
-            position: absolute;
-            bottom: 10px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: clamp(.55rem, 1.5vw, .68rem);
-            color: rgba(0, 0, 0, .6);
-            letter-spacing: .1em;
+        #start-overlay.hidden {
+            display: none !important;
         }
     </style>
-    <base target="_blank">
 </head>
 
 <body>
-    <div id="page-container">
 
-        <!-- PAGE 1 -->
-        <div class="page" id="page1">
-            <div class="home-wrap">
-                <div class="clock-time" id="clk-hm">00:00</div>
-                <div class="clock-date" id="clk-d">—</div>
-                <div class="sep"></div>
-                <div class="udesk-name">uDesk</div>
-                <div class="udesk-sub">this is your space.</div>
-            </div>
-        </div>
+    <div class="page">
+        <div class="focus-wrap">
+            <button class="nav-arrow left" id="prevBtn">‹</button>
+            <button class="nav-arrow right" id="nextBtn">›</button>
 
-        <!-- PAGE 3 – AA -->
-        <div class="page hidden-right" id="page3">
-            <div id="aa-wrap">
-                <div id="aa-ui">
-                    <div id="aa-level-lbl">Level <span id="aa-lvl">1</span></div>
-                    <div id="aa-score-lbl">Puan: <span id="aa-pts">0</span></div>
-                    <div id="aa-balls-lbl">Top: <span id="aa-left">0</span></div>
+            <div class="pages-track" id="pagesTrack">
+
+                <div class="page-slide welcome-slide" id="welcomeSlide">
+                    <div class="hero-section">
+                        <div class="vector-container">
+                            <svg viewBox="0 0 400 400" class="vector-art">
+                                <!-- Yörüngeler -->
+                                <circle cx="200" cy="200" r="160" stroke="var(--gold)" stroke-opacity="0.1"
+                                    stroke-width="1.5" fill="none" stroke-dasharray="8 12" class="spin-slow"
+                                    style="animation-duration: 40s;" />
+                                <circle cx="200" cy="200" r="120" stroke="var(--blue)" stroke-opacity="0.15"
+                                    stroke-width="1" fill="none" class="spin-reverse"
+                                    style="animation-duration: 30s;" />
+                                <circle cx="200" cy="200" r="80" stroke="var(--cream)" stroke-opacity="0.05"
+                                    stroke-width="1" fill="none" class="spin-slow" style="animation-duration: 20s;" />
+
+                                <!-- Gezegen 1 (En dış yörünge, Sağdan başlar) cx=360, cy=200 -->
+                                <g class="spin-slow" style="animation-duration: 25s;">
+                                    <circle cx="360" cy="200" r="4" fill="var(--gold)" class="orb-1" />
+                                </g>
+
+                                <!-- Gezegen 2 (Orta yörünge - Ters Yönde, Aşağıdan başlar) cx=200, cy=320 -->
+                                <g class="spin-reverse" style="animation-duration: 18s;">
+                                    <circle cx="200" cy="320" r="3" fill="var(--blue)" class="orb-2" />
+                                </g>
+
+                                <!-- Gezegen 3 (En iç yörünge, Soldan başlar) cx=120, cy=200 -->
+                                <g class="spin-slow" style="animation-duration: 12s;">
+                                    <circle cx="120" cy="200" r="5" fill="var(--cream)" class="orb-3" />
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="hero-content">
+                            <h1 class="hero-title">Welcome to MiniWeb</h1>
+                        </div>
+                        <div class="scroll-prompt" id="scrollPrompt">
+                            <span>Scroll</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="welcome-details">
+                        <p class="slide-text">MiniWeb is a modular environment designed for you. Build dynamic widgets,
+                            track live data, and create personalized tools that fit directly into your daily workflow.
+                        </p>
+                        <p class="slide-text">To customize this system, structure new layouts, or inject your own logic,
+                            open your installation directory and modify the core file:</p>
+                        <div class="highlight-box">
+                            /mods/index.html
+                        </div>
+                        <p class="slide-text" style="margin-top: 25px; color: var(--gold); letter-spacing: 0.5px;">Swipe
+                            right or use the arrows to see what you can build.</p>
+                    </div>
                 </div>
-                <canvas id="aa-canvas"></canvas>
-                <div id="aa-hint">Ekrana dokun / tıkla → Top fırlat</div>
-                <div id="aa-overlay">
-                    <h2>AA</h2>
-                    <div class="aa-sub">Dönen çarka top at, çakıştırma!</div>
-                    <button class="aa-btn" id="aa-start-btn">BAŞLA</button>
+
+                <div class="page-slide">
+                    <span class="slide-kicker">With MiniWeb you can:</span>
+                    <h2 class="slide-title">Customize Interfaces</h2>
+
+                    <div class="clock-container">
+                        <div id="digitalClock" class="digital-clock font-default">00:00:00</div>
+
+                        <div id="analogClock" class="analog-clock">
+                            <div class="analog-center"></div>
+                            <div id="hourHand" class="hand hour-hand"></div>
+                            <div id="minHand" class="hand min-hand"></div>
+                            <div id="secHand" class="hand sec-hand"></div>
+                        </div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="btn active" id="btnDigital">Digital</button>
+                        <button class="btn" id="btnAnalog">Analog</button>
+                        <div style="width: 100%; height: 0;"></div>
+
+                        <span id="fontControls" style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+                            <button class="btn active" id="btnFontDefault">Default</button>
+                            <button class="btn" id="btnFontOxanium">Oxanium</button>
+                            <button class="btn" id="btnFontOrbitron">Orbitron</button>
+                        </span>
+
+                        <span id="themeControls" style="display:none; gap:8px; flex-wrap:wrap; justify-content:center;">
+                            <button class="btn active" id="btnThemeDark">Dark</button>
+                            <button class="btn" id="btnThemeLight">Light</button>
+                        </span>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- PAGE 2 -->
-        <div class="page hidden-right" id="page2">
-            <div class="game-info">
-                <div class="score-box">Sen: <span id="pscore">0</span></div>
-                <div class="game-lbl">Ping Pong</div>
-                <div class="score-box">Bot: <span id="bscore">0</span></div>
-            </div>
-            <canvas id="game-canvas" width="600" height="400"></canvas>
-            <div class="game-hint">Fare / Dokunmatik ile sürükle</div>
-            <div id="start-overlay">
-                <h2>Ping Pong</h2>
-                <p>Bot'a karşı oyna — İlk 5 puan kazanır</p>
-                <button class="start-btn-cls" id="start-btn">BAŞLA</button>
-            </div>
-        </div>
-    </div>
+                <div class="page-slide">
+                    <span class="slide-kicker">With MiniWeb you can:</span>
+                    <h2 class="slide-title">Manage Tasks</h2>
 
-    <div id="nav-bar">
-        <button class="nav-btn active" id="btn1" onclick="goTo(1)"><span class="nav-arr">◀</span> uDesk</button>
-        <button class="nav-btn" id="btn2" onclick="goTo(2)">Pong</button>
-        <button class="nav-btn" id="btn3" onclick="goTo(3)">AA <span class="nav-arr">▶</span></button>
+                    <div class="todo-container">
+                        <div class="todo-input-group">
+                            <input type="text" id="todoInput" placeholder="What needs to be done?" autocomplete="off">
+                            <button id="addTodoBtn">Add</button>
+                        </div>
+                        <ul class="todo-list" id="todoList">
+                            <label class="todo-item">
+                                <input type="checkbox">
+                                <span>Initialize core database</span>
+                            </label>
+                            <label class="todo-item">
+                                <input type="checkbox" checked>
+                                <span>Update network protocols</span>
+                            </label>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="page-slide">
+                    <span class="slide-kicker">With MiniWeb you can:</span>
+                    <h2 class="slide-title">Display Data Feeds</h2>
+
+                    <div class="news-grid">
+                        <div class="news-card">
+                            <span class="news-category">Technology</span>
+                            <h3 class="news-headline">Quantum Processors Reach New Stability Milestone</h3>
+                            <span class="news-meta">2 hours ago • TechDaily</span>
+                        </div>
+                        <div class="news-card">
+                            <span class="news-category">Development</span>
+                            <h3 class="news-headline">New Lightweight Framework Promises Zero-Latency Rendering</h3>
+                            <span class="news-meta">5 hours ago • DevNews</span>
+                        </div>
+                        <div class="news-card">
+                            <span class="news-category">Space</span>
+                            <h3 class="news-headline">Orbital Telescope Captures Clearest Image of Exoplanet</h3>
+                            <span class="news-meta">12 hours ago • AstroWeekly</span>
+                        </div>
+                        <div class="news-card">
+                            <span class="news-category">Design</span>
+                            <h3 class="news-headline">Glassmorphism Returns: Why UI Trends Are Shifting Back</h3>
+                            <span class="news-meta">1 day ago • UI/UX Insider</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-slide">
+                    <span class="slide-kicker">With MiniWeb you can:</span>
+                    <h2 class="slide-title">Create Mini Games</h2>
+
+                    <div class="game-wrapper">
+                        <div class="game-info">
+                            <div class="score-box">You: <span id="pscore">0</span></div>
+                            <div class="game-lbl">Ping Pong</div>
+                            <div class="score-box">Bot: <span id="bscore">0</span></div>
+                        </div>
+                        <div class="canvas-container">
+                            <canvas id="game-canvas" width="600" height="400"></canvas>
+                            <div id="start-overlay">
+                                <h3>Ping Pong</h3>
+                                <p>Play against Bot — First to 5 wins</p>
+                                <button class="btn active" id="start-btn"
+                                    style="padding: 10px 30px; font-weight: 700;">START</button>
+                            </div>
+                        </div>
+                        <p class="slide-text" style="text-align: center; margin-top: 12px; font-size: 0.7rem;">Drag
+                            up/down with mouse or touch</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="focus-dots" id="focusDots"></div>
+        </div>
     </div>
 
     <script>
-        // ── SAAT ────────────────────────────────────────────────────────
-        const D = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
-        const M = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
-        function p2(n) { return String(n).padStart(2, '0') }
-        function tickClock() {
-            const n = new Date();
-            document.getElementById('clk-hm').textContent = p2(n.getHours()) + ':' + p2(n.getMinutes());
-            document.getElementById('clk-d').textContent = D[n.getDay()] + ', ' + n.getDate() + ' ' + M[n.getMonth()] + ' ' + n.getFullYear();
+        const track = document.getElementById('pagesTrack');
+        const slides = Array.from(track.children);
+        const dotsWrap = document.getElementById('focusDots');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const welcomeSlide = document.getElementById('welcomeSlide');
+        const scrollPrompt = document.getElementById('scrollPrompt');
+        let idx = 0;
+
+        slides.forEach((_, i) => {
+            const d = document.createElement('button');
+            if (i === 0) d.classList.add('on');
+            d.addEventListener('click', () => go(i));
+            dotsWrap.appendChild(d);
+        });
+
+        function render() {
+            track.style.transform = `translateX(-${idx * 100}%)`;
+            Array.from(dotsWrap.children).forEach((d, i) => d.classList.toggle('on', i === idx));
+
+            if (idx === 0) {
+                prevBtn.setAttribute('disabled', 'true');
+            } else {
+                prevBtn.removeAttribute('disabled');
+            }
+
+            if (idx === slides.length - 1) {
+                nextBtn.setAttribute('disabled', 'true');
+            } else {
+                nextBtn.removeAttribute('disabled');
+            }
         }
-        tickClock();
-        setInterval(tickClock, 1000);
 
-        // ── SAYFA GEÇİŞ ─────────────────────────────────────────────────
-        let curPage = 1;
-        function goTo(n) {
-            if (n === curPage) return;
-            const pages = [document.getElementById('page1'), document.getElementById('page2'), document.getElementById('page3')];
-            const btns = [document.getElementById('btn1'), document.getElementById('btn2'), document.getElementById('btn3')];
-            const prev = curPage;
-            curPage = n;
+        function go(n) {
+            idx = Math.max(0, Math.min(slides.length - 1, n));
+            render();
+        }
 
-            pages.forEach((p, i) => {
-                p.classList.remove('hidden-left', 'hidden-right');
-                if (i + 1 < n) p.classList.add('hidden-left');
-                else if (i + 1 > n) p.classList.add('hidden-right');
+        prevBtn.addEventListener('click', () => go(idx - 1));
+        nextBtn.addEventListener('click', () => go(idx + 1));
+
+        let startX = null;
+        let isScrolling = false;
+
+        track.addEventListener('touchstart', e => {
+            startX = e.touches[0].clientX;
+            isScrolling = false;
+        }, { passive: true });
+
+        track.addEventListener('touchmove', () => {
+            isScrolling = true;
+        }, { passive: true });
+
+        track.addEventListener('touchend', e => {
+            if (startX === null || isScrolling) return;
+            const dx = startX - e.changedTouches[0].clientX;
+            if (Math.abs(dx) > 40) go(idx + (dx > 0 ? 1 : -1));
+            startX = null;
+        }, { passive: true });
+
+        window.addEventListener('keydown', e => {
+            const tag = document.activeElement.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+            if (e.key === 'ArrowLeft') go(idx - 1);
+            if (e.key === 'ArrowRight') go(idx + 1);
+        });
+
+        scrollPrompt.addEventListener('click', () => {
+            welcomeSlide.scrollTo({
+                top: welcomeSlide.scrollHeight,
+                behavior: 'smooth'
             });
-            btns.forEach((b, i) => b.classList.toggle('active', i + 1 === n));
+        });
 
-            if (prev === 2) gamePaused = true;
-            if (n === 3) aaResume(); else aaPause();
+        welcomeSlide.addEventListener('scroll', () => {
+            if (welcomeSlide.scrollTop > 50) {
+                scrollPrompt.style.opacity = '0';
+                scrollPrompt.style.pointerEvents = 'none';
+            } else {
+                scrollPrompt.style.opacity = '1';
+                scrollPrompt.style.pointerEvents = 'auto';
+            }
+        });
+
+        const digitalClock = document.getElementById('digitalClock');
+        const analogClock = document.getElementById('analogClock');
+        const hourHand = document.getElementById('hourHand');
+        const minHand = document.getElementById('minHand');
+        const secHand = document.getElementById('secHand');
+
+        const btnDigital = document.getElementById('btnDigital');
+        const btnAnalog = document.getElementById('btnAnalog');
+        const fontBtns = [
+            { btn: document.getElementById('btnFontDefault'), cls: 'font-default' },
+            { btn: document.getElementById('btnFontOxanium'), cls: 'font-oxanium' },
+            { btn: document.getElementById('btnFontOrbitron'), cls: 'font-orbitron' }
+        ];
+
+        const fontControls = document.getElementById('fontControls');
+        const themeControls = document.getElementById('themeControls');
+        const btnThemeDark = document.getElementById('btnThemeDark');
+        const btnThemeLight = document.getElementById('btnThemeLight');
+
+        btnDigital.addEventListener('click', () => {
+            digitalClock.style.display = 'block';
+            analogClock.style.display = 'none';
+            btnDigital.classList.add('active');
+            btnAnalog.classList.remove('active');
+            fontControls.style.display = 'flex';
+            themeControls.style.display = 'none';
+        });
+
+        btnAnalog.addEventListener('click', () => {
+            digitalClock.style.display = 'none';
+            analogClock.style.display = 'block';
+            btnAnalog.classList.add('active');
+            btnDigital.classList.remove('active');
+            fontControls.style.display = 'none';
+            themeControls.style.display = 'flex';
+        });
+
+        btnThemeDark.addEventListener('click', () => {
+            analogClock.classList.remove('light');
+            btnThemeDark.classList.add('active');
+            btnThemeLight.classList.remove('active');
+        });
+
+        btnThemeLight.addEventListener('click', () => {
+            analogClock.classList.add('light');
+            btnThemeLight.classList.add('active');
+            btnThemeDark.classList.remove('active');
+        });
+
+        fontBtns.forEach(item => {
+            item.btn.addEventListener('click', () => {
+                digitalClock.classList.remove('font-default', 'font-oxanium', 'font-orbitron');
+                digitalClock.classList.add(item.cls);
+                fontBtns.forEach(f => f.btn.classList.remove('active'));
+                item.btn.classList.add('active');
+            });
+        });
+
+        function pad(n) { return String(n).padStart(2, '0'); }
+
+        function updateClock() {
+            const now = new Date();
+            const h = now.getHours();
+            const m = now.getMinutes();
+            const s = now.getSeconds();
+
+            digitalClock.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+
+            const secDeg = (s / 60) * 360;
+            const minDeg = ((m + s / 60) / 60) * 360;
+            const hourDeg = ((h % 12 + m / 60) / 12) * 360;
+
+            secHand.style.transform = `rotate(${secDeg}deg)`;
+            minHand.style.transform = `rotate(${minDeg}deg)`;
+            hourHand.style.transform = `rotate(${hourDeg}deg)`;
         }
 
-        // ── PONG ─────────────────────────────────────────────────────────
-        // Maksimum sadelik: sıfır shadow, sıfır arc, sadece fillRect
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        const todoInput = document.getElementById('todoInput');
+        const addTodoBtn = document.getElementById('addTodoBtn');
+        const todoList = document.getElementById('todoList');
+
+        function addTodo() {
+            const text = todoInput.value.trim();
+            if (!text) return;
+
+            const label = document.createElement('label');
+            label.className = 'todo-item';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+
+            const span = document.createElement('span');
+            span.textContent = text;
+
+            label.appendChild(checkbox);
+            label.appendChild(span);
+            todoList.appendChild(label);
+
+            todoInput.value = '';
+            todoList.scrollTop = todoList.scrollHeight;
+        }
+
+        addTodoBtn.addEventListener('click', addTodo);
+        todoInput.addEventListener('keypress', e => {
+            if (e.key === 'Enter') addTodo();
+        });
+
+        // ── PONG Game ───────────────────────────────────────────────────
         const cv = document.getElementById('game-canvas');
         const cx = cv.getContext('2d', { alpha: false, desynchronized: true });
         const GW = 600, GH = 400, PW = 12, PH = 80, BR = 5;
         const WIN = 5;
 
-        // Delta-time tabanlı hızlar (px/saniye)
-        const SPD0 = 220;   // başlangıç top hızı
-        const SPDMAX = 460; // max top hızı
-
-        // Bot: %60 başarı oranı — gerçekten kaçırır
-        // Botun tepki gecikmesi (ms): top yaklaşmadan önce bu kadar bekler
-        const BOT_PX_S = 160;        // bot hareket hızı px/s — düşük!
-        const BOT_MISS_CHANCE = 0.38; // her servis başında %38 ihtimalle o servisı kaybeder
+        const SPD0 = 220;
+        const SPDMAX = 460;
+        const BOT_PX_S = 160;
+        const BOT_MISS_CHANCE = 0.38;
         const BOT_DEADZONE = 18;
 
-        let pY, bY, bX, bY2, bVX, bVY;
+        let pY = GH / 2 - PH / 2, bY = GH / 2 - PH / 2, bX = GW / 2, bY2 = GH / 2, bVX, bVY;
         let pSc = 0, bSc = 0;
         let running = false, gamePaused = false;
         let raf = null, lt = 0;
-        let botWillMiss = false;   // bu servis için bot hata yapacak mı?
-        let botMissOff = 0;        // hata yapacaksa ne kadar sapacak
+        let botWillMiss = false;
+        let botMissOff = 0;
 
-        function resize() {
-            const mw = Math.min(window.innerWidth * .95, 600);
-            const mh = Math.min(window.innerHeight * .55, 400);
-            const sc = Math.min(mw / 600, mh / 400);
-            cv.style.width = (600 * sc) + 'px';
-            cv.style.height = (400 * sc) + 'px';
-        }
-        resize();
-        window.addEventListener('resize', resize);
-
-        // Dokunmatik/fare
         let drag = false, dragOff = 0;
+
         function cY(e) {
             const r = cv.getBoundingClientRect();
             const cy = (e.touches && e.touches.length) ? e.touches[0].clientY : e.clientY;
             return (cy - r.top) * (GH / r.height);
         }
+
         cv.addEventListener('mousedown', e => { if (!running || gamePaused) return; drag = true; dragOff = cY(e) - pY; });
         cv.addEventListener('mousemove', e => { if (!drag || !running || gamePaused) return; e.preventDefault(); pY = Math.max(0, Math.min(GH - PH, cY(e) - dragOff)); });
         window.addEventListener('mouseup', () => { drag = false; });
@@ -555,7 +1160,6 @@
 
         function resetBall() {
             bX = GW / 2; bY2 = GH / 2;
-            // Her servis başında botun bu seferi kaçırıp kaçırmayacağını belirle
             botWillMiss = (Math.random() < BOT_MISS_CHANCE);
             botMissOff = botWillMiss ? ((Math.random() > 0.5 ? 1 : -1) * (PH * 0.6 + Math.random() * PH * 0.4)) : 0;
             const ang = (Math.random() - .5) * .7;
@@ -581,7 +1185,7 @@
             running = false;
             if (raf) cancelAnimationFrame(raf);
             const ol = document.getElementById('start-overlay');
-            ol.innerHTML = '<h2>' + (w === 'p' ? 'KAZANDIN!' : 'BOT KAZANDI') + '</h2><p>Sen ' + pSc + ' — ' + bSc + ' Bot</p><button class="start-btn-cls" id="rb">TEKRAR OYNA</button>';
+            ol.innerHTML = '<h3>' + (w === 'p' ? 'YOU WIN!' : 'BOT WINS') + '</h3><p>You ' + pSc + ' — ' + bSc + ' Bot</p><button class="btn active" id="rb" style="padding: 10px 30px; font-weight: 700;">PLAY AGAIN</button>';
             ol.classList.remove('hidden');
             document.getElementById('rb').addEventListener('click', startGame);
         }
@@ -590,14 +1194,10 @@
             if (!running || gamePaused) return;
             const d = Math.min(dt, 50) / 1000;
 
-            // ── Bot hareketi ──
-            // Hedef: top bota geliyorsa paddle merkezini topa hizala, ama ağır ve hatalı
             let targetMid;
             if (bVX > 0) {
-                // Top bota geliyor — botun hedefi (hata payı ile)
-                targetMid = bY2 + botMissOff; // botWillMiss ise sapıyor
+                targetMid = bY2 + botMissOff;
             } else {
-                // Top uzaklaşıyor — ortalıyor
                 targetMid = GH / 2;
             }
             const botMid = bY + PH / 2;
@@ -608,14 +1208,11 @@
             }
             bY = Math.max(0, Math.min(GH - PH, bY));
 
-            // ── Top ──
             bX += bVX * d; bY2 += bVY * d;
 
-            // Duvar
             if (bY2 - BR <= 0) { bVY = Math.abs(bVY); bY2 = BR; }
             else if (bY2 + BR >= GH) { bVY = -Math.abs(bVY); bY2 = GH - BR; }
 
-            // Oyuncu paddle
             if (bVX < 0 && bX - BR <= 22 && bX - BR >= 10 && bY2 + BR >= pY && bY2 - BR <= pY + PH) {
                 bX = 22 + BR;
                 const rel = (bY2 - pY) / PH - .5;
@@ -625,7 +1222,6 @@
                 bVY = Math.sin(a) * spd;
             }
 
-            // Bot paddle
             if (bVX > 0 && bX + BR >= GW - 22 && bX + BR <= GW - 10 && bY2 + BR >= bY && bY2 - BR <= bY + PH) {
                 bX = GW - 22 - BR;
                 const rel = (bY2 - bY) / PH - .5;
@@ -635,7 +1231,6 @@
                 bVY = Math.sin(a) * spd;
             }
 
-            // Gol
             if (bX < -BR) {
                 bSc++; document.getElementById('bscore').textContent = bSc;
                 if (bSc >= WIN) { endGame('b'); return; }
@@ -649,24 +1244,19 @@
         }
 
         function draw() {
-            // Arka plan - tek fillRect, sıfır efekt
-            cx.fillStyle = '#08080f';
+            cx.fillStyle = '#0b0a08';
             cx.fillRect(0, 0, GW, GH);
 
-            // Orta çizgi — basit tek renk
-            cx.fillStyle = 'rgba(255,255,255,0.05)';
-            for (let y = 0; y < GH; y += 20)cx.fillRect(GW / 2 - .5, y, 1, 10);
+            cx.fillStyle = 'rgba(243, 234, 216, 0.05)';
+            for (let y = 0; y < GH; y += 20) cx.fillRect(GW / 2 - .5, y, 1, 10);
 
-            // Oyuncu paddle
-            cx.fillStyle = '#fff';
+            cx.fillStyle = '#f3ead8';
             cx.fillRect(10, pY, PW, PH);
 
-            // Bot paddle
-            cx.fillStyle = 'rgba(255,255,255,.4)';
+            cx.fillStyle = 'rgba(243, 234, 216, 0.4)';
             cx.fillRect(GW - 10 - PW, bY, PW, PH);
 
-            // Top — sadece kare, sıfır arc
-            cx.fillStyle = '#00ffc8';
+            cx.fillStyle = '#d8bd8e';
             cx.fillRect(bX - BR, bY2 - BR, BR * 2, BR * 2);
         }
 
@@ -677,290 +1267,9 @@
             draw();
             raf = requestAnimationFrame(loop);
         }
-
-        // ilk çizim
         draw();
 
-        // ── SWIPE ─────────────────────────────────────────────────────────
-        let tx = 0;
-        document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
-        document.addEventListener('touchend', e => {
-            const d = tx - e.changedTouches[0].clientX;
-            if (Math.abs(d) > 60) {
-                if (d > 0 && curPage < 3) goTo(curPage + 1);
-                else if (d < 0 && curPage > 1) goTo(curPage - 1);
-            }
-        }, { passive: true });
-
-        // ── AA OYUNU ─────────────────────────────────────────────────────
-        (function () {
-            const canvas = document.getElementById('aa-canvas');
-            const ctx = canvas.getContext('2d');
-
-            // Renkler (bej tema)
-            const BG = '#f5f0e8';
-            const DARK = '#111111';
-            const ACCENT = '#111111';
-            const BALL_CLR = '#111111';
-            const STUCK_CLR = '#111111';
-            const HUB_CLR = '#111111';
-
-            // Seviye tanımları: [top sayısı, dönüş hızı (rad/s), ilave çubuk?]
-            const LEVELS = [
-                { balls: 5, rpm: 40 },
-                { balls: 7, rpm: 50 },
-                { balls: 9, rpm: 62 },
-                { balls: 11, rpm: 75 },
-                { balls: 13, rpm: 90 },
-                { balls: 15, rpm: 108 },
-                { balls: 17, rpm: 128 },
-                { balls: 20, rpm: 150 },
-            ];
-
-            let W, H, CX, CY, RADIUS, BALL_R, HUB_R;
-            let level = 0, score = 0;
-            let angle = 0;          // çark açısı (radyan)
-            let stuckBalls = [];    // çubuğa yapışmış toplar [{angle, dist}]
-            let flyBalls = [];      // havadaki toplar [{x,y,vy}]
-            let ballsLeft = 0;
-            let shootCooldown = 0;
-            let aaRunning = false;
-            let aaRaf = null, aaLt = 0;
-            let aaSpeed = 0;        // mevcut açısal hız (rad/s, ±)
-            let collided = false;   // çakışma oldu mu
-
-            function resize() {
-                const size = Math.min(window.innerWidth, window.innerHeight * 0.88, 420);
-                W = size; H = size;
-                canvas.width = W; canvas.height = H;
-                CX = W / 2; CY = H / 2;
-                RADIUS = W * 0.36;
-                BALL_R = W * 0.038;
-                HUB_R = W * 0.11;
-            }
-
-            function initLevel() {
-                const lv = LEVELS[Math.min(level, LEVELS.length - 1)];
-                ballsLeft = lv.balls;
-                aaSpeed = (lv.rpm * Math.PI / 180) * (Math.random() > 0.5 ? 1 : -1);
-                stuckBalls = [];
-                flyBalls = [];
-                collided = false;
-                angle = 0;
-                document.getElementById('aa-lvl').textContent = level + 1;
-                document.getElementById('aa-left').textContent = ballsLeft;
-                document.getElementById('aa-pts').textContent = score;
-            }
-
-            function startAA() {
-                document.getElementById('aa-overlay').style.display = 'none';
-                level = 0; score = 0;
-                initLevel();
-                aaRunning = true;
-                if (aaRaf) cancelAnimationFrame(aaRaf);
-                aaLt = performance.now();
-                aaRaf = requestAnimationFrame(aaLoop);
-            }
-
-            function aaPause() {
-                aaRunning = false;
-                if (aaRaf) { cancelAnimationFrame(aaRaf); aaRaf = null; }
-            }
-
-            function aaResume() {
-                if (!aaRunning && document.getElementById('aa-overlay').style.display === 'none') {
-                    aaRunning = true;
-                    aaLt = performance.now();
-                    aaRaf = requestAnimationFrame(aaLoop);
-                }
-            }
-
-            function shoot() {
-                if (!aaRunning || collided || ballsLeft <= 0 || shootCooldown > 0) return;
-                flyBalls.push({ x: CX, y: H - BALL_R * 2, vy: -W * 1.1 });
-                ballsLeft--;
-                document.getElementById('aa-left').textContent = ballsLeft;
-                shootCooldown = 220; // ms
-            }
-
-            canvas.addEventListener('click', shoot);
-            canvas.addEventListener('touchstart', e => { e.preventDefault(); shoot(); }, { passive: false });
-            document.getElementById('aa-start-btn').addEventListener('click', startAA);
-
-            function showOverlay(title, sub, btnTxt) {
-                const ol = document.getElementById('aa-overlay');
-                ol.style.display = 'flex';
-                ol.innerHTML = '<h2>' + title + '</h2><div class="aa-sub">' + sub + '</div><button class="aa-btn" id="aa-start-btn">' + btnTxt + '</button>';
-                document.getElementById('aa-start-btn').addEventListener('click', startAA);
-            }
-
-            function aaLoop(ts) {
-                if (!aaRunning) return;
-                const dt = Math.min(ts - aaLt, 50) / 800;
-                aaLt = ts;
-                shootCooldown = Math.max(0, shootCooldown - dt * 7000);
-
-                // Çark dönüşü — her topun sıkışma pozisyonu güncellenir
-                angle += aaSpeed * dt;
-
-                // Uçan toplar
-                for (let i = flyBalls.length - 1; i >= 0; i--) {
-                    const b = flyBalls[i];
-                    b.y += b.vy * dt;
-
-                    // Hub çarpışması (merkez daire)
-                    const dx = b.x - CX, dy = b.y - CY;
-                    const dist = Math.hypot(dx, dy);
-                    if (dist < HUB_R + BALL_R) {
-                        // Çubuğun üstüne yapış — hub kenarına
-                        const snapAngle = angle; // referans çark açısı
-                        const relAngle = Math.atan2(dy, dx) - angle;
-                        stuckBalls.push({ relAngle, dist: HUB_R + BALL_R });
-                        flyBalls.splice(i, 1);
-                        score++;
-                        document.getElementById('aa-pts').textContent = score;
-                        checkCollision();
-                        continue;
-                    }
-
-                    // Çubuğa (RADIUS mesafesine) yaklaşma — dairenin çevresine yapış
-                    if (dist >= RADIUS - BALL_R * 1.2 && dist <= RADIUS + BALL_R * 0.5) {
-                        const relAngle = Math.atan2(dy, dx) - angle;
-                        stuckBalls.push({ relAngle, dist: RADIUS });
-                        flyBalls.splice(i, 1);
-                        score++;
-                        document.getElementById('aa-pts').textContent = score;
-                        checkCollision();
-                        continue;
-                    }
-
-                    // Ekran dışı
-                    if (b.y < -BALL_R * 2) {
-                        flyBalls.splice(i, 1);
-                    }
-                }
-
-                // Tüm toplar atıldı mı? (ve hava boş)
-                if (ballsLeft === 0 && flyBalls.length === 0 && !collided) {
-                    // Seviye tamamlandı
-                    aaRunning = false;
-                    setTimeout(() => {
-                        level++;
-                        if (level >= LEVELS.length) {
-                            showOverlay('TAMAMLANDI!', 'Puan: ' + score, 'TEKRAR');
-                        } else {
-                            initLevel();
-                            aaRunning = true;
-                            aaLt = performance.now();
-                            aaRaf = requestAnimationFrame(aaLoop);
-                            return;
-                        }
-                    }, 400);
-                    draw();
-                    return;
-                }
-
-                draw();
-                aaRaf = requestAnimationFrame(aaLoop);
-            }
-
-            function checkCollision() {
-                // Yapışık toplar birbirine çok yakın mı?
-                for (let i = 0; i < stuckBalls.length; i++) {
-                    for (let j = i + 1; j < stuckBalls.length; j++) {
-                        const ai = stuckBalls[i].relAngle + angle;
-                        const aj = stuckBalls[j].relAngle + angle;
-                        const xi = CX + Math.cos(ai) * stuckBalls[i].dist;
-                        const yi = CY + Math.sin(ai) * stuckBalls[i].dist;
-                        const xj = CX + Math.cos(aj) * stuckBalls[j].dist;
-                        const yj = CY + Math.sin(aj) * stuckBalls[j].dist;
-                        if (Math.hypot(xi - xj, yi - yj) < BALL_R * 1.85) {
-                            triggerCollision();
-                            return;
-                        }
-                    }
-                }
-            }
-
-            function triggerCollision() {
-                collided = true;
-                aaRunning = false;
-                if (aaRaf) { cancelAnimationFrame(aaRaf); aaRaf = null; }
-                // Flash
-                canvas.style.outline = '3px solid #d00';
-                setTimeout(() => { canvas.style.outline = ''; }, 300);
-                setTimeout(() => {
-                    score = Math.max(0, score - stuckBalls.length);
-                    showOverlay('KAYBETTIN!', 'Puan: ' + score + ' — Level ' + (level + 1), 'TEKRAR');
-                }, 500);
-            }
-
-            function draw() {
-                ctx.clearRect(0, 0, W, H);
-                ctx.fillStyle = BG;
-                ctx.fillRect(0, 0, W, H);
-
-                // Çark çemberi (ince daire)
-                ctx.beginPath();
-                ctx.arc(CX, CY, RADIUS, 0, Math.PI * 2);
-                ctx.strokeStyle = 'rgba(0,0,0,0.1)';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                // Yapışık toplar
-                for (const b of stuckBalls) {
-                    const a = b.relAngle + angle;
-                    const x = CX + Math.cos(a) * b.dist;
-                    const y = CY + Math.sin(a) * b.dist;
-                    ctx.beginPath();
-                    ctx.arc(x, y, BALL_R, 0, Math.PI * 2);
-                    ctx.fillStyle = STUCK_CLR;
-                    ctx.fill();
-                    // İnce çizgi hub'a
-                    ctx.beginPath();
-                    ctx.moveTo(CX, CY);
-                    ctx.lineTo(x, y);
-                    ctx.strokeStyle = 'rgba(0,0,0,0.12)';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                }
-
-                // Hub dairesi
-                ctx.beginPath();
-                ctx.arc(CX, CY, HUB_R, 0, Math.PI * 2);
-                ctx.fillStyle = HUB_CLR;
-                ctx.fill();
-
-                // Level yazısı hub içinde
-                ctx.fillStyle = BG;
-                ctx.font = `800 ${HUB_R * 0.55}px 'Orbitron', monospace`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(level + 1, CX, CY - HUB_R * 0.1);
-                ctx.font = `400 ${HUB_R * 0.25}px 'Orbitron', monospace`;
-                ctx.fillStyle = 'rgba(245,240,232,0.5)';
-                ctx.fillText('LEVEL', CX, CY + HUB_R * 0.32);
-
-                // Uçan toplar
-                for (const b of flyBalls) {
-                    ctx.beginPath();
-                    ctx.arc(b.x, b.y, BALL_R, 0, Math.PI * 2);
-                    ctx.fillStyle = BALL_CLR;
-                    ctx.fill();
-                }
-
-                // Atış noktası (altta)
-                ctx.beginPath();
-                ctx.arc(CX, H - BALL_R * 2, BALL_R * 0.6, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(0,0,0,0.18)';
-                ctx.fill();
-            }
-
-            // İlk çizim
-            resize();
-            draw();
-            window.addEventListener('resize', () => { resize(); draw(); });
-        })();
+        render();
     </script>
 </body>
 

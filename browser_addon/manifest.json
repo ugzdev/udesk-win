@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "uDesk Sender",
+  "version": "1.0",
+  "description": "uDesk webpage sender.",
+  "action": {
+    "default_title": "Send uDesk",
+    "default_icon": {
+      "16": "udesk_icon16.png",
+      "48": "udesk_icon48.png",
+      "128": "udesk_icon128.png"
+    }
+  },
+  "icons": {
+    "16": "udesk_icon16.png",
+    "48": "udesk_icon48.png",
+    "128": "udesk_icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "tabs",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "<all_urls>",
+    "http://localhost:51481/"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "all_frames": true,
+      "js": [
+        "content.js"
+      ]
+    }
+  ]
+}
