@@ -87,12 +87,23 @@ last_net_time = time.time()
 APP_STARTUP_NAME = "uDeskAutoStart"
 
 def get_executable_path():
-    """Çalışma ortamına göre doğru dosya yolunu döndürür (.py veya .exe)"""
+    # 1. Ana dizini bul
     if getattr(sys, 'frozen', False):
-        # PyInstaller vb. ile .exe yapılmışsa
+        base_dir = os.path.dirname(sys.executable)
+    else:
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        
+    # 2. Launcher'ın yolunu oluştur
+    launcher_path = os.path.join(base_dir, "uDeskLauncher.exe")
+    
+    # 3. Eğer klasörde udesk_launcher.exe varsa, başlangıca onu ekle!
+    if os.path.exists(launcher_path):
+        return f'"{launcher_path}"'
+        
+    # 4. Eğer launcher yoksa (veya geliştirme ortamındaysan) eski sistemden devam et
+    if getattr(sys, 'frozen', False):
         return f'"{sys.executable}"'
     else:
-        # Geliştirme ortamında .py olarak çalışıyorsa
         return f'"{sys.executable}" "{os.path.abspath(__file__)}"'
 
 def check_startup_status():
@@ -1353,6 +1364,18 @@ class UDeskUI(QMainWindow):
         font_path = os.path.join(BASE_DIR, "fonts", "Orbitron.ttf")
         if os.path.exists(font_path):
             QFontDatabase.addApplicationFont(font_path)
+            
+        # ---- SECURE BOOT ----
+        current_settings = load_settings()
+        
+        if "--recovery" in sys.argv:
+            was_active = current_settings.get("server_auto_start", False)
+            self.server_checkbox.setChecked(was_active)
+        else:
+            self.server_checkbox.setChecked(False)
+            current_settings["server_auto_start"] = False
+            save_settings(current_settings)
+        # ------------------------------------------------
 
     def setup_ui(self):
         root = QWidget()
@@ -1373,7 +1396,7 @@ class UDeskUI(QMainWindow):
         nav_layout.addWidget(logo)
         nav_layout.addStretch()
 
-        version_lbl = QLabel("by UGZ - version 1.0")
+        version_lbl = QLabel("by UGZ - v1.1.0")
         version_lbl.setObjectName("VersionLabel")
         nav_layout.addWidget(version_lbl)
         
@@ -1513,11 +1536,16 @@ class UDeskUI(QMainWindow):
         checkbox_layout.setAlignment(Qt.AlignCenter)
         checkbox_layout.setSpacing(30) # İki checkbox arası boşluk
 
+        current_settings = load_settings()
+        
+        # Eğer current_settings bir nedenden dolayı bozuk/boş ise dict'e çevir
+        if not isinstance(current_settings, dict):
+            current_settings = {}
+
         # 1. Tüm Sunucuları Aç/Kapat Checkbox'ı
         self.server_checkbox = QCheckBox("Enable Service")
         self.server_checkbox.setObjectName("CookieCheckBox")
         self.server_checkbox.setCursor(Qt.PointingHandCursor)
-        self.server_checkbox.setChecked(False)
         self.server_checkbox.stateChanged.connect(self.toggle_server_state)
         checkbox_layout.addWidget(self.server_checkbox)
 
@@ -1534,21 +1562,19 @@ class UDeskUI(QMainWindow):
         self.usb_checkbox = QCheckBox("USB Mode")
         self.usb_checkbox.setObjectName("CookieCheckBox")
         self.usb_checkbox.setCursor(Qt.PointingHandCursor)
-        # Ayarı diskten oku
-        current_settings = load_settings()
+        
+        # Güvenli okuma: "usb_mode" yoksa otomatik False kabul et
         self.usb_mode_saved = current_settings.get("usb_mode", False)
+        
         self.usb_checkbox.blockSignals(True)
         self.usb_checkbox.setChecked(self.usb_mode_saved)
         self.usb_checkbox.blockSignals(False)
         
-        # Eğer kaydedilmiş ayar USB ise açılışta tüneli kur
         if self.usb_mode_saved:
             toggle_usb_adb_mode(True)
             
         self.usb_checkbox.stateChanged.connect(self.toggle_usb_mode)
         checkbox_layout.addWidget(self.usb_checkbox)
-
-        # Yatay kutuyu ana ekrana (cl) ekle
         cl.addLayout(checkbox_layout)
 
         if saved_url:
@@ -1590,7 +1616,17 @@ class UDeskUI(QMainWindow):
         
     def toggle_server_state(self, state):
         global SERVER_ACTIVE
-        if state == Qt.Checked:
+        is_checked = (state == Qt.Checked)
+        
+        # Durumu anında JSON'a kaydet (çökerse hafızada kalsın)
+        settings = load_settings()
+        if not isinstance(settings, dict):
+            settings = {} # Eğer JSON bozuksa sıfırdan oluştur
+            
+        settings["server_auto_start"] = is_checked
+        save_settings(settings)
+
+        if is_checked:
             SERVER_ACTIVE = True
             
             if not hasattr(self, 'server_thread') or not self.server_thread.isRunning():
@@ -1602,8 +1638,7 @@ class UDeskUI(QMainWindow):
             if not hasattr(self, 'http_thread') or not self.http_thread.isRunning():
                 self.http_thread = ExtensionServerThread()
                 self.http_thread.start()
-                
-            # SUNUCU AÇIKKEN USB AYARINI DEĞİŞTİRMEYİ YASAKLA
+            
             self.usb_checkbox.setEnabled(False)
             
             self.toggle_server_action.setText("Deactivate")
