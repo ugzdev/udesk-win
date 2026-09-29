@@ -1317,7 +1317,7 @@ class UDeskUI(QMainWindow):
         self.app_signals = AppSignals()
         self.app_signals.safe_execute.connect(lambda func: func())
         
-        icon_path = os.path.join(BASE_DIR, "icons", "app_icon_000.png")
+        icon_path = os.path.join(BASE_DIR, "icons", "app_icon.png")
         self.setWindowIcon(QIcon(icon_path))
         self.setFixedSize(660, 800)
         self._gif_movie = None
