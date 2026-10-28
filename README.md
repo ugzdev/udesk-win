@@ -5,18 +5,6 @@
 
   <p><b>A local network bridge connecting your Windows PC and Android device for remote control, system monitoring, and custom macro execution.</b></p>
   <p><sub>Developed by <b>UGZ</b></sub></p>
-
-  <br>
-
-  <p>
-    <a href="PLAY_STORE_LINK_HERE">
-      <img src="https://img.shields.io/badge/Get%20it%20on-Google%20Play-414141?style=for-the-badge&logo=googleplay&logoColor=3DDC84" alt="Get it on Google Play">
-    </a>
-    <a href="GITHUB_RELEASE_LINK_HERE">
-      <img src="https://img.shields.io/badge/Download-Windows%20Server-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Download for Windows">
-    </a>
-  </p>
-
   <p>
     <img src="https://img.shields.io/badge/platform-Windows%2010%2F11-blue?style=flat-square">
     <img src="https://img.shields.io/badge/python-3.9%2B-3776AB?style=flat-square&logo=python&logoColor=white">
